@@ -40,7 +40,12 @@ class GoldenRetriever():
         self.nyjson = response.json()
 
     def unsolve(self) -> Solver:
-        return
+        cards = [
+            Card(content = card['content'], position = card['position'])
+            for category in self.nyjson['categories']
+            for card in category['cards']
+        ]
+        return Solver(cards = cards)
 
 
 if __name__ == '__main__':
@@ -49,8 +54,3 @@ if __name__ == '__main__':
     j = getter.nyjson
     print(json.dumps(j))
 
-    [
-    card['content']
-    for category in j['categories']
-    for card in category['cards']
-    ]
