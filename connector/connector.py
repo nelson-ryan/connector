@@ -30,7 +30,7 @@ class GoldenRetriever():
         self._get_puzzle()
 
     def _get_puzzle(self):
-        # TODO retrieve from DB first
+        # TODO retrieve from DB first; pull from web if not present
         try:
             response = requests.get(self.url)
             response.raise_for_status()
@@ -38,6 +38,9 @@ class GoldenRetriever():
             raise e
         self.raw = response.text
         self.nyjson = response.json()
+
+    def _store_puzzle(self):
+        pass
 
     def unsolve(self) -> Solver:
         cards = [
