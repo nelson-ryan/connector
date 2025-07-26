@@ -10,7 +10,18 @@ def test_card():
     puzzle = GoldenRetriever('2025-07-22')
     solver = puzzle.unsolve()
     assert(any([(card.content == "MOUTH" and card.position == 14) for card in solver.cards]))
+    assert len(solver.cards) == 16
 
+def test_deglove_get():
+    testword = 'banana'
+    dg = Deglover([testword])
+    assert isinstance(dg.vectors, dict)
+    assert isinstance(dg.vectors[testword], np.ndarray)
+    assert len(dg.vectors[testword]) == 300
 
-def test_nytpuzzle():
-    pass
+def test_card_embedget():
+    puzzle = GoldenRetriever('2025-07-22')
+    solver = puzzle.unsolve()
+    assert all([
+        (len(vector) == 300) for vector in solver.embeddings.values()
+    ])
