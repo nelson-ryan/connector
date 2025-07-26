@@ -1,17 +1,65 @@
+from connector import *
 import requests
 import json
 from datetime import datetime
-
+import numpy as np
 
 class Card():
+    """Contains a given word's info as listed in the NYT 'card' entries.
+       Named for how each word is presented in the game, i.e. on cards.
+    """
     def __init__(self, content : str, position : int):
         self.content = content
         self.position = position
+
+    def retrieve_embedding(self):
+        raise NotImplementedError
 
 
 class Solver():
     def __init__(self, cards : list[Card]):
         self.cards = cards
+        self.deglover = Deglover([card.content for card in self.cards])
+        self.embeddings = self.deglover.vectors # feels sloppy to duplicate
+
+    @staticmethod
+    def _pnorm(a, p = 2):
+        return np.power((sum(np.power(a,p))), (1/p))
+
+    @staticmethod
+    def _cosim(a, b):
+        numer = np.dot(a, b)
+        denom = Solver._pnorm(a)*Solver._pnorm(b)
+        return numer / denom
+
+    def solve(self):
+        raise NotImplementedError
+
+
+class Deglover():
+    """Accesses the GloVe embedding file and retrieves only the
+       relevant words' vectors.
+    """
+    def __init__(self, words : list):
+        self.embeddingfile = EMBEDDINGPATH
+        self.words = words
+        self.vectors = {word : np.zeros(DIMENSIONS) for word in self.words}
+        self._deglove()
+
+    def _deglove(self):
+        wordholder = self.words.copy()
+        # TODO move embeddings to a DB or pickle or something;
+        # this can take a lot of seconds to run
+        with open(self.embeddingfile) as file:
+            while (
+                ( line := file.readline() ) and wordholder
+           ):
+                sep = line.split()
+                word = sep[0]
+                if word in wordholder:
+                    self.vectors[word] = np.array(sep[1:])
+                    wordholder.remove(word)
+        return None
 
 
 class GoldenRetriever():
@@ -40,7 +88,7 @@ class GoldenRetriever():
         self.nyjson = response.json()
 
     def _store_puzzle(self):
-        pass
+        raise NotImplementedError
 
     def unsolve(self) -> Solver:
         cards = [
