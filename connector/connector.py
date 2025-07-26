@@ -54,10 +54,10 @@ class Deglover():
             while (
                 ( line := file.readline() ) and wordholder
            ):
-                sep = line.split()
-                word = sep[0]
-                if word in wordholder:
-                    self.vectors[word] = np.array(sep[1:])
+                if any(line.startswith(word) for word in self.words):
+                    vec = line.split()
+                    word = vec[0]
+                    self.vectors[word] = np.array(vec[1:])
                     wordholder.remove(word)
         return None
 
