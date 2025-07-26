@@ -1,5 +1,6 @@
 
 # TODO dynamically save and extract if missing
-EMBEDDINGPATH = "data/glove.42B.300d.txt"
+GLOVEVERSION = "glove.42B.300d"
 DIMENSIONS = 300
-
+GLOVEURL = f"https://nlp.stanford.edu/data/{GLOVEVERSION}.zip"
+EMBEDDINGPATH = f"data/{GLOVEVERSION}.txt"
