@@ -1,4 +1,4 @@
-from connector import *
+from connector.config import *
 import requests
 import json
 from datetime import datetime
