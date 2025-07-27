@@ -44,7 +44,7 @@ class Deglover():
     """Accesses the GloVe embedding file and retrieves only the
        relevant words' vectors.
     """
-    def __init__(self, words : list):
+    def __init__(self, words : list = []):
         self.embeddingfile = Path(EMBEDDINGPATH)
         self.words = words
         self.vectors = {word : np.zeros(DIMENSIONS) for word in self.words}
