@@ -9,5 +9,5 @@ def test_db_working():
 def test_retrieve_embeddings():
     words = ['stripes', 'cushion']
     res = db.retrieve_embeddings(words)
-    toks = [r[0] for r in res]
-    assert all(w in toks for w in words)
+    assert len(words) == len(res)
+    assert all(w in res.keys() for w in words)
