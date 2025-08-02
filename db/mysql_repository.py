@@ -29,8 +29,13 @@ class MysqlRepository(Repository):
     def retrieve_stored_solution(self):
         raise NotImplementedError
 
-    def retrieve_embedding(self):
-        raise NotImplementedError
+    def retrieve_embeddings(self, words : list):
+        placeholders = ', '.join(['%s'] * len(words))
+        self.cursor.execute(f"""
+            select token, vector from embeddings e
+            where token in ({placeholders});
+        """, words)
+        return self.cursor.fetchall()
 
     def __del__(self):
         self.connection.close()

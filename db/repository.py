@@ -19,6 +19,6 @@ class Repository(metaclass = abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def retrieve_embedding(self):
+    def retrieve_embeddings(self, words : list):
         raise NotImplementedError
 
