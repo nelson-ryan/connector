@@ -2,10 +2,29 @@ create database connector;
 use connector;
 
 create table embeddings (
-    id int not null auto_increment,
+    id int not null auto_increment primary key,
     token varchar(80),
-    vector varchar(3000),
-    primary key (id)
+    vector varchar(3000)
+);
+
+create table puzzles (
+    id int not null primary key,
+    status varchar(2),
+    print_date date not null,
+    editor varchar(80)
+);
+
+create table categories (
+    id int not null auto_increment primary key,
+    title varchar(80) not null,
+    puzzle_id int references puzzles(id)
+);
+
+create table cards (
+    id int not null auto_increment primary key,
+    content varchar(80) not null,
+    position tinyint unsigned, -- unused by connector, part of puzzle
+    category_id int references categories(id)
 );
 
 insert into embeddings
