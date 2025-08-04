@@ -6,6 +6,7 @@ import numpy as np
 from pathlib import Path
 import warnings
 
+
 class Card():
     """Contains a given word's info as listed in the NYT 'card' entries.
        Named for how each word is presented in the game, i.e. on cards.
@@ -14,12 +15,16 @@ class Card():
         self.content = content
         self.position = position
 
-    def retrieve_embedding(self):
+    def _retrieve_embedding(self):
         raise NotImplementedError
 
+class Category():
+    def __init__(self):
+        pass
 
 class Solver():
     """Contains machinery to solve the Connections puzzle.
+       There may or may not be motivation for giving this its own class.
     """
     def __init__(self, cards : list[Card]):
         self.cards = cards
@@ -40,9 +45,44 @@ class Solver():
         raise NotImplementedError
 
 
+class Puzzle():
+    def __init__(self,
+                 status : str = "",
+                 id : str = "",
+                 print_date : str = "",
+                 editor : str = "",
+                 categories : list = []
+    ):
+        self.status = status
+        self.id = id
+        self.print_date = print_date
+        self.editor = editor
+        self.categories = {
+            category['title']: [ Card(**card) for card in category['cards'] ]
+            for category in categories
+        }
+
+    def store_puzzle(self):
+        raise NotImplementedError
+
+    def _list_cards(self):
+        return [
+            card.content
+            for cards in self.categories.values()
+            for card in cards
+        ]
+
+    def unsolve(self) -> Solver:
+        return Solver(cards =
+          [card for cardlist in self.categories.values() for card in cardlist]
+        )
+
+
 class Deglover():
     """Accesses the GloVe embedding file and retrieves only the
        relevant words' vectors.
+       Because this requires the massive GloV embeddings files, this may be
+       best left out.
     """
     def __init__(self, words : list = []):
         self.embeddingfile = Path(EMBEDDINGPATH)
@@ -125,21 +165,12 @@ class GoldenRetriever():
         self.raw = response.text
         self.nyjson = response.json()
 
-    def _store_puzzle(self):
-        raise NotImplementedError
-
-    def unsolve(self) -> Solver:
-        cards = [
-            Card(content = card['content'], position = card['position'])
-            for category in self.nyjson['categories']
-            for card in category['cards']
-        ]
-        return Solver(cards = cards)
-
+    def puzzle(self):
+        return Puzzle(**self.nyjson)
 
 if __name__ == '__main__':
 
-    getter = GoldenRetriever('2025-07-20')
+    getter = GoldenRetriever('2025-07-22')
     j = getter.nyjson
     print(json.dumps(j))
 
