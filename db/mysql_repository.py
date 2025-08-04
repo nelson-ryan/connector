@@ -1,5 +1,6 @@
 from db.repository import Repository
 import mysql.connector
+import numpy as np
 
 
 class MysqlRepository(Repository):
@@ -35,9 +36,10 @@ class MysqlRepository(Repository):
             select token, vector from embeddings e
             where token in ({placeholders});
         """, words)
-        d = {tok : vec for tok, vec in self.cursor.fetchall()}
+        d = {tok : np.array(vec.split())
+             for tok, vec in self.cursor.fetchall()}
         return d
 
     def __del__(self):
-        self.connection.close()
         self.cursor.close()
+        self.connection.close()

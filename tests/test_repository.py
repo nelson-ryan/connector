@@ -11,3 +11,16 @@ def test_retrieve_embeddings():
     res = db.retrieve_embeddings(words)
     assert len(words) == len(res)
     assert all(w in res.keys() for w in words)
+
+def test_retrieve_stored_puzzle():
+    pass
+
+from connector.connector import *
+
+def test_card_embedget():
+    gr = GoldenRetriever('2025-07-22')
+    puzzle = gr.puzzle()
+    embeddings = db.retrieve_embeddings(puzzle._list_cards())
+    assert all([
+        (len(vector) == 300) for vector in embeddings.values()
+    ])
