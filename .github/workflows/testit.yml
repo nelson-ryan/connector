@@ -1,0 +1,44 @@
+name: Connector Testing
+
+on:
+  push:
+    branches: [testingtesting]
+  pull_request:
+    branches: [testingtesting]
+
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      MYSQL_ROOT_PASSWORD: woof
+      TAG: "lookatme"
+
+    services:
+      mysql:
+        image: mysql
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ env.MYSQL_ROOT_PASSWORD }}
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=10s
+          --health-retries=5
+        volumes:
+          - ./data:/docker-entrypoint-initdb.d/:ro
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build the docker image
+        run: |
+          docker build . --file Dockerfile --tag ${TAG}
+
+      - name: Run the tests
+
+        run: |
+          docker run -i --network ${{ job.services.mysql.network }} ${TAG} \
+          python -m pytest tests
