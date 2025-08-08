@@ -1,6 +1,6 @@
-from db.mysql_repository import MysqlRepository
+from db.mysql_repository import MysqlRepository as ActiveRepository
 
-db = MysqlRepository()
+db = ActiveRepository()
 
 def test_db_working():
     db.cursor.execute("select now();")

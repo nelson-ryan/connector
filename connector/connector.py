@@ -5,7 +5,10 @@ from datetime import datetime
 import numpy as np
 from pathlib import Path
 import warnings
+from db.mysql_repository import MysqlRepository as ActiveRepository
+from k_means_constrained import KMeansConstrained
 
+repo = ActiveRepository()
 
 class Card():
     """Contains a given word's info as listed in the NYT 'card' entries.
@@ -15,34 +18,15 @@ class Card():
         self.content = content
         self.position = position
 
-    def _retrieve_embedding(self):
-        raise NotImplementedError
+    def __str__(self):
+        return self.content
+
+    def __repr__(self):
+        return self.content
 
 class Category():
     def __init__(self):
         pass
-
-class Solver():
-    """Contains machinery to solve the Connections puzzle.
-       There may or may not be motivation for giving this its own class.
-    """
-    def __init__(self, cards : list[Card]):
-        self.cards = cards
-        self.deglover = Deglover([card.content for card in self.cards])
-        self.embeddings = self.deglover.vectors # feels sloppy to duplicate
-
-    @staticmethod
-    def _pnorm(a, p = 2):
-        return np.power((sum(np.power(a,p))), (1/p))
-
-    @staticmethod
-    def _cosim(a, b):
-        numer = np.dot(a, b)
-        denom = Solver._pnorm(a)*Solver._pnorm(b)
-        return numer / denom
-
-    def solve(self):
-        raise NotImplementedError
 
 
 class Puzzle():
@@ -61,6 +45,10 @@ class Puzzle():
             category['title']: [ Card(**card) for card in category['cards'] ]
             for category in categories
         }
+        self.cards = sorted(
+            [card for cards in self.categories.values() for card in cards],
+            key = lambda card: card.position
+        )
 
     def store_puzzle(self):
         raise NotImplementedError
@@ -72,10 +60,22 @@ class Puzzle():
             for card in cards
         ]
 
-    def unsolve(self) -> Solver:
-        return Solver(cards =
-          [card for cardlist in self.categories.values() for card in cardlist]
+    @property
+    def embeddings(self):
+        return repo.retrieve_embeddings(self.cards)
+
+    @property
+    def vectordata(self):
+        return np.array([v for v in self.embeddings.values()])
+
+    def cluster(self):
+        kmeans = KMeansConstrained(
+            n_clusters = 4,
+            size_min = 4,
+            size_max = 4
         )
+        kmeans.fit(self.vectordata)
+        return kmeans.labels_
 
 
 class Deglover():

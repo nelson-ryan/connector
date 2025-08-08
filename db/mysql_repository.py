@@ -31,6 +31,10 @@ class MysqlRepository(Repository):
         raise NotImplementedError
 
     def retrieve_embeddings(self, words : list) -> dict:
+        words = [
+            str(word) if not isinstance(word, str) else word
+            for word in words
+        ]
         placeholders = ', '.join(['%s'] * len(words))
         self.cursor.execute(f"""
             select token, vector from embeddings e
