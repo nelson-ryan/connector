@@ -18,8 +18,7 @@ def test_retrieve_stored_puzzle():
 from connector.connector import *
 
 def test_card_embedget():
-    gr = GoldenRetriever('2025-07-22')
-    puzzle = gr.puzzle()
+    puzzle = Puzzle('2025-07-22')
     embeddings = db.retrieve_embeddings(puzzle._list_cards())
     assert all([
         (len(vector) == 300) for vector in embeddings.values()

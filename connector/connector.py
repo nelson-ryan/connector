@@ -24,41 +24,45 @@ class Card():
     def __repr__(self):
         return self.content
 
+
 class Category():
     def __init__(self):
         pass
 
 
 class Puzzle():
-    def __init__(self,
-                 status : str = "",
-                 id : str = "",
-                 print_date : str = "",
-                 editor : str = "",
-                 categories : list = []
-    ):
-        self.status = status
-        self.id = id
-        self.print_date = print_date
-        self.editor = editor
+    def __init__(self, print_date : str = ""):
+
+        self.fetcher = GoldenRetriever(print_date)
+        nyjson = self.fetcher.nyjson
+
+        self.status = nyjson['status']
+        self.id = nyjson['id']
+        self.print_date = nyjson['print_date']
+        self.editor = nyjson['editor']
         self.categories = {
             category['title']: [ Card(**card) for card in category['cards'] ]
-            for category in categories
+            for category in nyjson['categories']
         }
-        self.cards = sorted(
+        self.cards = self._list_cards()
+
+    def __repr__(self):
+        return (
+            f"------- {self.print_date}-------" +
+            '\n'.join(
+                ' '.join(str(card) for card in cat)
+                for cat in self.categories.values()
+            )
+        )
+
+    def _list_cards(self):
+        return sorted(
             [card for cards in self.categories.values() for card in cards],
             key = lambda card: card.position
         )
 
     def store_puzzle(self):
-        raise NotImplementedError
-
-    def _list_cards(self):
-        return [
-            card.content
-            for cards in self.categories.values()
-            for card in cards
-        ]
+        self.fetcher.throw_ball()
 
     @property
     def embeddings(self):
@@ -69,6 +73,8 @@ class Puzzle():
         return np.array([v for v in self.embeddings.values()])
 
     def cluster(self):
+        """
+        """
         kmeans = KMeansConstrained(
             n_clusters = 4,
             size_min = 4,
@@ -101,9 +107,11 @@ class Deglover():
             while (
                 ( line := file.readline() ) and wordholder
            ):
-                if any(line.startswith(word) for word in self.words):
+                if any(line.startswith(word.lower()) for word in wordholder):
                     vec = line.split()
-                    word = vec[0]
+                    word = vec[0].upper()
+                    if word not in wordholder:
+                        continue
                     self.vectors[word] = np.array(vec[1:])
                     wordholder.remove(word)
         return None
@@ -137,6 +145,7 @@ class Deglover():
         # TODO
         raise NotImplementedError
 
+
 class GoldenRetriever():
     BASEURL = "http://www.nytimes.com/svc/connections/v2/"
 
@@ -165,8 +174,9 @@ class GoldenRetriever():
         self.raw = response.text
         self.nyjson = response.json()
 
-    def puzzle(self):
-        return Puzzle(**self.nyjson)
+    def throw_ball(self):
+        raise NotImplementedError
+
 
 if __name__ == '__main__':
 

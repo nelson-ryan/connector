@@ -2,8 +2,7 @@ from connector.connector import *
 
 
 
-gr = GoldenRetriever('2025-07-22')
-puzzle = gr.puzzle()
+puzzle = Puzzle('2025-07-22')
 
 
 def test_makedata():
