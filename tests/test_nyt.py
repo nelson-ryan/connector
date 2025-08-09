@@ -1,4 +1,5 @@
 from connector.connector import *
+from utils.utils import *
 
 gr = GoldenRetriever('2025-07-22')
 puzzle = Puzzle('2025-07-22')
