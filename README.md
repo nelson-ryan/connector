@@ -1,17 +1,65 @@
 ## `connector`: An NYT Games Connections Solver
 
+The objective of this project is to create an automated solver for the New York
+Times daily *Connections* puzzle.  
+The intended mechanism for generating the solution is to classify the words in
+the puzzle using pre-trained embeddings (as of writing,
+[embeddings used are from GloVe](https://nlp.stanford.edu/projects/glove/)).
+
+The primary use case is to collect the puzzle information for a given date
+and output a classification of each of the puzzles "cards."
+
+Future developments may include:
+
+* a UI to provide said date.
+* a comparison (indiviually or in aggregate) of `connector`'s success rate of
+correctly-solved puzzles.
+
+
+![New York Times API Logo](https://developer.nytimes.com/files/poweredby_nytimes_200c.png?v=1583354208354)
 
 ```mermaid
 classDiagram
 
+class Repository {
+    <<interface>>
+    store_puzzle()
+    retrieve_stored_puzzle()
+    store_solution()
+    retrieve_stored_solution()
+    retrieve_embeddings()
+}
+
+class Scraper {
+    +BASEURL : str
+    _get_web_puzzle(): json
+}
+
 class GoldenRetriever {
-    <<datatype>> 
     nyjson : dict
     print_date : str
 
-    _get_puzzle() : None
+    +fetch_puzzle() : None
     _store_puzzle() : None
-    unsolve() : Solver
+}
+
+class Puzzle {
+    <<service>>
+    +status: str
+    +id: int
+    +print_date: str
+    +editor: str
+    +categories: [Card[4]]
+    +cards: Card[16]
+    -fetcher: GoldenRetriever
+
+    -embeddings : dict
+    -vectordata : np.array[16]
+
+    -_list_cards() : Card[16]
+    -_cluster() : float[16]
+    +solve() : [Card[4]][4]
+
 }
 
 class Card{
@@ -20,18 +68,12 @@ class Card{
     +position : int
 }
 
-class Solver{
+class Category {
     <<datatype>> 
-    cards : Card[4]
-    deglover : Deglover
-
-    _cosim(a : ndarray, b : ndarray) : float
-    solve() : [Card[4]][4]
 }
 
 
 class Deglover{
-    <<datatype>> 
     embeddingfile : Path
     words : str[16]
     vectors : dict
@@ -42,7 +84,16 @@ class Deglover{
     _unzip_glove() : Path
 }
 
-GoldenRetriever "1" --> "1" Solver : generates
-Deglover --* Solver
-Card "1" --o "16" Deglover
-Card "1" --o "16" Solver
+
+MysqlRepository --|>  Repository
+GoldenRetriever --|> MysqlRepository
+GoldenRetriever --|> Scraper
+
+GoldenRetriever --* Puzzle 
+Card "1" --o "16" Puzzle
+
+Card --o Category
+Category --* Puzzle
+
+
+```
