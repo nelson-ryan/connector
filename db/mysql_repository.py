@@ -1,6 +1,7 @@
 from db.repository import Repository
 import mysql.connector
 import numpy as np
+from collections import defaultdict
 
 
 class MysqlRepository(Repository):
@@ -18,14 +19,47 @@ class MysqlRepository(Repository):
         self.cursor = self.connection.cursor()
 
 
-    def store_puzzle(self):
+    def store_puzzle(self, nyjson : dict):
+        sql = f"""
+        set @print_date = %s
+
+        """
         raise NotImplementedError
 
     def retrieve_stored_puzzle(self, print_date):
-        print(print_date)
-        raise NotImplementedError
+        """
+        Retrieves and re-recreates json from data in database.
+        TODO: Convert to json from a single query
+        """
+        # First get genral puzzle data to start the dict
         self.cursor.execute("""
-        """)
+            select id, status, editor, print_date
+            from puzzles where print_date = %s
+        ;""", [print_date])
+        pcols = self.cursor.column_names
+        pdata = self.cursor.fetchall()[0]
+        if not pdata:
+            return None
+
+        build_json = {c:v for c, v in zip(pcols, pdata)}
+        build_json['print_date'] = print_date
+        build_json['categories'] = defaultdict(list)
+
+        # Now fill in categories and cards
+        self.cursor.execute("""
+            select cat.title, c.content, c.position
+            from cards c
+            join categories cat on cat.id = c.category_id
+            join puzzles p on p.id = cat.puzzle_id
+            and p.print_date = %s
+        ;""", [print_date])
+
+        cdata = self.cursor.fetchall()
+        for card in cdata:
+            build_json['categories'][card[0]].append(
+                { 'content' : card[1], 'position' : card[2] }
+            )
+        return build_json
 
     def store_solution(self):
         raise NotImplementedError

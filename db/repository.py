@@ -3,7 +3,7 @@ import abc
 class Repository(metaclass = abc.ABCMeta):
 
     @abc.abstractmethod
-    def store_puzzle(self):
+    def store_puzzle(self, nyjson : dict):
         raise NotImplementedError
 
     @abc.abstractmethod
