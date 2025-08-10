@@ -3,6 +3,7 @@ from connector.pieces import *
 from connector.retriever import *
 import numpy as np
 from k_means_constrained import KMeansConstrained
+from collections import defaultdict
 
 class Puzzle():
     def __init__(self, print_date):
@@ -18,7 +19,6 @@ class Puzzle():
             category['title']: [ Card(**card) for card in category['cards'] ]
             for category in nyjson['categories']
         }
-        self.cards = self._list_cards()
 
     def __repr__(self):
         return (
@@ -28,6 +28,10 @@ class Puzzle():
                 for cat in self.categories.values()
             )
         )
+
+    @property
+    def cards(self):
+        return self._list_cards()
 
     def _list_cards(self):
         return sorted(
@@ -46,8 +50,9 @@ class Puzzle():
     def vectordata(self):
         return np.array([v for v in self.embeddings.values()])
 
-    def cluster(self):
+    def _cluster(self) -> np.ndarray:
         """
+        Classification, returns vector of labels
         """
         kmeans = KMeansConstrained(
             n_clusters = 4,
@@ -56,6 +61,14 @@ class Puzzle():
         )
         kmeans.fit(self.vectordata)
         return kmeans.labels_
+
+    def solve(self) -> dict:
+        solution = defaultdict(list)
+        clustered = self._cluster()
+        for cluster, card in zip(clustered, self.cards):
+            solution[cluster].append(card)
+        return solution
+
 
 
 if __name__ == '__main__':
