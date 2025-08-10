@@ -7,7 +7,7 @@ class Repository(metaclass = abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def retrieve_stored_puzzle(self):
+    def retrieve_stored_puzzle(self, print_date):
         raise NotImplementedError
 
     @abc.abstractmethod

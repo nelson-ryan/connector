@@ -6,7 +6,7 @@ import numpy as np
 class MysqlRepository(Repository):
 
     def __init__(self):
-        super().__init__()
+        # super().__init__()
         config = {
             'user': 'root',
             'password': 'woof',
@@ -21,8 +21,11 @@ class MysqlRepository(Repository):
     def store_puzzle(self):
         raise NotImplementedError
 
-    def retrieve_stored_puzzle(self):
+    def retrieve_stored_puzzle(self, print_date):
+        print(print_date)
         raise NotImplementedError
+        self.cursor.execute("""
+        """)
 
     def store_solution(self):
         raise NotImplementedError

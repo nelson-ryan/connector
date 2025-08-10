@@ -1,7 +1,16 @@
+import numpy as np
 from datetime import datetime, timedelta
 from connector.connector import *
 from pathlib import Path
 import warnings
+
+def validate_print_date(print_date):
+    try:
+        datetime.strptime(print_date, '%Y-%m-%d')
+    except ValueError:
+        raise Exception("Gotta be YYYY-MM-DD")
+    except TypeError:
+        raise Exception("Gotta be str")
 
 class Deglover():
     """Accesses the GloVe embedding file and retrieves only the
