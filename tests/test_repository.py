@@ -20,10 +20,11 @@ def test_retrieve_stored_puzzle():
     assert(gotem['editor'] == 'Jon Do')
     assert(len(gotem['categories']) == 4)
     assert(all(len(c) == 4 for c in gotem['categories'].values()))
-    # TODO this does not mirror nyjsonjj
+    # TODO this does not mirror nyjson
 
 from connector.connector import *
-puzzle = Puzzle('2025-07-22')
+solver = Solver('2025-07-22')
+puzzle = Puzzle(solver.fetcher.nyjson)
 
 def test_card_embedget():
     embeddings = db.retrieve_embeddings(puzzle._list_cards())
@@ -32,7 +33,7 @@ def test_card_embedget():
     ])
 
 def test_card_embedget_from_Puzzle():
-    embeddings = puzzle.embeddings
+    embeddings = solver.embeddings
     assert all([
         (len(vector) == 300) for vector in embeddings.values()
     ])

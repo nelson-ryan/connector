@@ -12,6 +12,7 @@ and output a classification of each of the puzzles "cards."
 Future developments may include:
 
 * a UI to provide said date.
+* different `Solver`s for varied approaches to calculating a solution.
 * a comparison (indiviually or in aggregate) of `connector`'s success rate of
 correctly-solved puzzles.
 
@@ -20,19 +21,25 @@ correctly-solved puzzles.
 
 ```mermaid
 classDiagram
+direction LR
 
 class Repository {
     <<interface>>
-    store_puzzle()
-    retrieve_stored_puzzle()
-    store_solution()
-    retrieve_stored_solution()
-    retrieve_embeddings()
+    +store_puzzle(Puzzle)
+    +retrieve_stored_puzzle(print_date)
+    +store_solution()
+    +retrieve_stored_solution()
+    +retrieve_embeddings(Card[*])
+}
+
+class MysqlRepository {
+    -connection
+    -cursor
 }
 
 class Scraper {
     +BASEURL : str
-    _get_web_puzzle(): json
+    _get_web_puzzle(print_date) : json
 }
 
 class GoldenRetriever {
@@ -44,19 +51,24 @@ class GoldenRetriever {
 }
 
 class Puzzle {
-    <<service>>
+    <<datatype>>
     +status: str
     +id: int
     +print_date: str
     +editor: str
     +categories: [Card[4]]
     +cards: Card[16]
+    -_list_cards() : Card[16]
+}
+
+class Solver {
+    <<service>>
     -fetcher: GoldenRetriever
+    +puzzle: Puzzle
 
     -embeddings : dict
     -vectordata : np.array[16]
 
-    -_list_cards() : Card[16]
     -_cluster() : float[16]
     +solve() : [Card[4]][4]
 
@@ -88,12 +100,13 @@ class Deglover{
 MysqlRepository --|>  Repository
 GoldenRetriever --|> MysqlRepository
 GoldenRetriever --|> Scraper
+Solver *-- Puzzle
 
-GoldenRetriever --* Puzzle 
+GoldenRetriever "1" --o "1" Solver 
 Card "1" --o "16" Puzzle
 
-Card --o Category
-Category --* Puzzle
+Card "4" --o "1" Category
+Category "4" --* "1" Puzzle
 
 
 ```

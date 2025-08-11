@@ -19,3 +19,36 @@ class Category():
         pass
 
 
+class Puzzle():
+    def __init__(self, nyjson):
+        self.status = nyjson['status']
+        self.id = nyjson['id']
+        self.print_date = nyjson['print_date']
+        self.editor = nyjson['editor']
+        self.categories = {
+            category['title']: [ Card(**card) for card in category['cards'] ]
+            for category in nyjson['categories']
+        }
+
+    def __repr__(self):
+        return (
+            f"------- {self.print_date}-------\n" +
+            '\n'.join(
+                ' '.join(str(card) for card in cat)
+                for cat in self.categories.values()
+            )
+        )
+
+    @property
+    def cards(self):
+        return self._list_cards()
+
+    def _list_cards(self):
+        return sorted(
+            [card for cards in self.categories.values() for card in cards],
+            key = lambda card: card.position
+        )
+
+    # def store_puzzle(self):
+    #     self.fetcher.throw_ball()
+
