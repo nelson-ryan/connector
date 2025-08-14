@@ -6,3 +6,5 @@ DIMENSIONS = 300
 GLOVEURL = f"https://nlp.stanford.edu/data/{GLOVEVERSION}.zip"
 # EMBEDDINGPATH = f"data/{GLOVEVERSION}.txt"
 EMBEDDINGPATH = Path(__file__).parent / "../data/testembeddings.txt"
+
+NYT_BASEURL = "http://www.nytimes.com/svc/connections/v2/"

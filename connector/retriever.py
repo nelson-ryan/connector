@@ -1,11 +1,12 @@
 import requests
 import json
+from connector.config import NYT_BASEURL
 from db.mysql_repository import MysqlRepository as ActiveRepository
 from utils.utils import validate_print_date
 
 
 class Scraper():
-    BASEURL = "http://www.nytimes.com/svc/connections/v2/"
+    BASEURL = NYT_BASEURL
 
     def __init__(self, print_date : str):
 

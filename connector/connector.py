@@ -1,4 +1,3 @@
-from connector.config import *
 from connector.pieces import *
 from connector.retriever import *
 import numpy as np
@@ -42,7 +41,4 @@ class Solver():
 
 
 if __name__ == '__main__':
-
-    getter = GoldenRetriever('2025-07-22')
-    j = getter.nyjson
-
+    pass
