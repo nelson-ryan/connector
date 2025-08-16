@@ -4,6 +4,24 @@
 <!--stops 'favicon' error-->
 <link rel="icon" href="data:,">
 
+<style>
+table {
+    border: 3px solid black;
+    border-collapse: collapse;
+}
+td, th {
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+    border-left: 1px dotted black;
+    border-right: 1px dotted black;
+    padding: 15px;
+    text-align: center;
+}
+th {
+    border: 2px solid black;
+}
+</style>
+
 <h1>
     <code>connector</code>
 </h1>
@@ -29,6 +47,8 @@
 
 </body>
 
+</html>
+
 <script>
 async function handleSubmit(event) {
     event.preventDefault();
@@ -40,9 +60,9 @@ async function handleSubmit(event) {
     var s = "http://localhost:5000/" + value.print_date
     const response = await fetch(s);
     const myJson = await response.json();
-    document.getElementById('groups').textContent = JSON.stringify(myJson, undefined, 2);
+    // document.getElementById('groups').textContent = JSON.stringify(myJson, undefined, 2);
 
-    // solution2table(myJson);
+    solution2table(myJson);
 
 }
 
@@ -52,6 +72,9 @@ function solution2table(solution) {
     for (const category in solution) {
         let row;
         row = document.createElement("tr");
+        h = document.createElement("th");
+        h.textContent = "Group" + category;
+        row.appendChild(h);
         for (const word of solution[category]) {
                 const cell = document.createElement("td");
                 cell.textContent = word;
