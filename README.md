@@ -1,14 +1,21 @@
 ## `connector`: An NYT Games Connections Solver
 
-The objective of this project is to create an automated solver for the New York
+Begun as a course project for LING 508 'Computational Techniques for Linguists'
+in Summer 2025,
+the objective of this project is to create an automated solver for the New York
 Times daily *Connections* puzzle.
 Thus the primary use case is to collect the puzzle information for a given date
 and output a classification of each of the puzzles "cards."  
 
 The present mechanism for generating the solution is a k-means classification
 using pre-trained embeddings
-[from the Stanford GloVe project](https://nlp.stanford.edu/projects/glove/).  
+[from the Stanford GloVe project](https://nlp.stanford.edu/projects/glove/).
 This k-means grouping does **not** reliably generate the correct puzzle solution.
+
+The project is ongoing.
+[`convector`](https://github.com/nelson-ryan/connector), developed later
+as part of LiNG 582 'Advanced Statistical Natural Language Processing'
+in Fall 2025, explores a more sophisticated approach to the same problem.
 
 ### Setup
 
